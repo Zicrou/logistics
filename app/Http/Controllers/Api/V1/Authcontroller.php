@@ -13,6 +13,7 @@ class AuthController extends Controller
 {
     public function register(RegisterFormRequest $request)
     {
+        // Validate the request data
         $data = $request->validated();
         
         $data['password'] = Hash::make($data['password']);
