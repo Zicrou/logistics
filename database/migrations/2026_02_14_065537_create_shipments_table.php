@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('reference', 50);
-            $table->string('container_number', 30);
+            $table->string('container_no', 30);
             $table->string('cargo_type', 50);
             $table->integer('weight');
             $table->string('status', 30);
-            $table->string('origin_port', 50);
-            $table->string('destination', 50);
+            $table->string('origin_port', 100);
+            $table->string('destination', 100);
             $table->timestamps();
         });
     }

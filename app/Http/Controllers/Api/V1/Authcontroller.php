@@ -8,9 +8,12 @@ use App\Http\Requests\V1\RegisterFormRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
 class AuthController extends Controller
 {
+        // 
     public function register(RegisterFormRequest $request)
     {
         // Validate the request data

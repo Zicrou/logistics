@@ -22,12 +22,12 @@ class ShipmentFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reference' => ['required','string','max:100'],
-            'container_no' => ['required','string','max:50'],
-            'cargo_type' => ['required','string','max:100'],
+            'reference' => ['required','string','max:50'],
+            'container_no' => ['required','string','max:30'],
+            'cargo_type' => ['required','string','max:50'],
             'origin_port' => ['required','string','max:100'],
             'destination' => ['required','string','max:100'],
-            'status' => ['required','string','in:pending,in_transit,delivered,cancelled'],
+            'status' => ['required','string','in:pending,in_transit,delivered,cancelled', 'max:30'],
             'weight' => ['required','numeric','min:0'],
         ];
     }

@@ -20,27 +20,21 @@ class ShipmentController extends Controller implements HasMiddleware
             new Middleware('auth:sanctum'),
         ];
     }
-    public function index()
+    public function index(Request $request)
     {
+        $token = $this->validateUser($request->bearerToken());
+        $shipments = Shipment::all();
         return response()->json([
             "ok" => true,
             "message" => "List of shipments",
-            "data" => []
+            "data" => $shipments,
+            'token' => $token
         ]);
     }
 
     public function store(ShipmentFormRequest $request)
     {
-        $tokenString = $request->bearerToken(); // Just the token string, no "Bearer"
-        $tokenFromRequest = PersonalAccessToken::findToken($tokenString);
-        $userExist = User::find($tokenFromRequest->tokenable_id);
-            if (!$userExist) {
-                return response()->json([
-                    "ok" => false,
-                    "message" => "Invalid token",
-                    "status" => 401
-                ], 401);
-            }
+        $token = $this->validateUser($request->bearerToken());
         $data = $request->validated();
         $shipment = Shipment::create($data);
 
@@ -48,8 +42,7 @@ class ShipmentController extends Controller implements HasMiddleware
             "ok" => true,
             "message" => "Shipment created successfully",
             "data" => $shipment,
-            'user' => $userExist,
-            "token" => $tokenFromRequest,
+            "token" => $token,
         ], 201);
     }
 
@@ -62,21 +55,43 @@ class ShipmentController extends Controller implements HasMiddleware
         ]);
     }
 
-    public  function update(Request $request, $id)
+    public  function update(ShipmentFormRequest $request, $id)
     {
+            $token = $this->validateUser($request->bearerToken());
+            $data = $request->validated();
+            $shipment = Shipment::findOrFail($id);
+            $shipmentUpdated = $shipment->update($data);
         return response()->json([
             "ok" => true,
             "message" => "Shipment updated successfully",
-            "data" => []
+            "data" => $shipment,
+            "token" => $token
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $token = $this->validateUser($request->bearerToken());
+        $shipment = Shipment::findOrFail($id);
+        $shipment->delete();
         return response()->json([
             "ok" => true,
             "message" => "Shipment deleted successfully",
-            "data" => []
+            "data" => [],
+            "token" => $token
         ]);
+    }
+
+    private function validateUser($token)
+    {
+        $tokenFromRequest = PersonalAccessToken::findToken($token);
+        if (!$tokenFromRequest) {
+            return response()->json([
+                "ok" => false,
+                "message" => "Invalid token",
+                "status" => 401
+            ], 401);
+        }
+        return $token;
     }
 }
