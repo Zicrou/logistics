@@ -10,7 +10,7 @@ use App\Models\User;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
-
+use App\Http\Resources\ShipmentResource;
 
 class ShipmentController extends Controller implements HasMiddleware
 {
@@ -23,13 +23,7 @@ class ShipmentController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         $token = $this->validateUser($request->bearerToken());
-        $shipments = Shipment::all();
-        return response()->json([
-            "ok" => true,
-            "message" => "List of shipments",
-            "data" => $shipments,
-            'token' => $token
-        ]);
+        return ShipmentResource::collection(Shipment::all());
     }
 
     public function store(ShipmentFormRequest $request)
