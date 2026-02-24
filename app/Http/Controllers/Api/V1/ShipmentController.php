@@ -33,7 +33,6 @@ class ShipmentController extends Controller implements HasMiddleware
         $shipment = Shipment::create($data);
 
         return response()->json([
-            "ok" => true,
             "message" => "Shipment created successfully",
             "data" => $shipment,
             "token" => $token,
@@ -43,7 +42,6 @@ class ShipmentController extends Controller implements HasMiddleware
     public function show($id)
     {
         return response()->json([
-            "ok" => true,
             "message" => "Shipment details",
             "data" => []
         ]);
@@ -56,7 +54,6 @@ class ShipmentController extends Controller implements HasMiddleware
             $shipment = Shipment::findOrFail($id);
             $shipmentUpdated = $shipment->update($data);
         return response()->json([
-            "ok" => true,
             "message" => "Shipment updated successfully",
             "data" => $shipment,
             "token" => $token
@@ -69,7 +66,6 @@ class ShipmentController extends Controller implements HasMiddleware
         $shipment = Shipment::findOrFail($id);
         $shipment->delete();
         return response()->json([
-            "ok" => true,
             "message" => "Shipment deleted successfully",
             "data" => [],
             "token" => $token
@@ -81,7 +77,6 @@ class ShipmentController extends Controller implements HasMiddleware
         $tokenFromRequest = PersonalAccessToken::findToken($token);
         if (!$tokenFromRequest) {
             return response()->json([
-                "ok" => false,
                 "message" => "Invalid token",
                 "status" => 401
             ], 401);
