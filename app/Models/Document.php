@@ -19,4 +19,8 @@ class Document extends Model
     public function shipment(){
         return $this->belongsTo(Shipment::class, 'shipment_id');
     }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

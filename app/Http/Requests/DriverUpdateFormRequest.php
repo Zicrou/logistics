@@ -29,6 +29,6 @@ class DriverUpdateFormRequest extends FormRequest
             'license_number' => ['required', 'string', 'max:50',Rule::unique('drivers', 'license_number')->ignore($this->route('driver'), 'id')],
             'vehicle_id' => ['required', 'uuid', 'unique:drivers,id', 'exists:vehicles,id'],
             'last_seen' => ['nullable', 'date']
-        ];;
+        ];
     }
 }
