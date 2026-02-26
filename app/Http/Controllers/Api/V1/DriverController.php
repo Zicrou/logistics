@@ -39,16 +39,7 @@ class DriverController extends Controller implements HasMiddleware
         return response()->json([
             "message" => "Driver created successfully",
             "data" => $driver,
-            "token" => $token,
         ], 201);
-    }
-
-    public function show($id)
-    {
-        return response()->json([
-            "message" => "Driver details",
-            "data" => []
-        ]);
     }
 
     public  function update(DriverUpdateFormRequest $request, $id)
@@ -56,13 +47,7 @@ class DriverController extends Controller implements HasMiddleware
             $token = $this->validateUser($request->bearerToken());
             $driver = Driver::findOrFail($id);
             $data = $request->validated();
-                // [
-                // 'full_name' => ['required', 'string', 'max:100'],
-                // 'phone' => ['required', 'string', 'max:30',Rule::unique('drivers', 'phone')->ignore($driver->id)],
-                // 'license_number' => ['string', 'max:50',Rule::unique('drivers', 'license_number')->ignore($driver->id)],
-                // 'vehicle_id' => ['required', 'uuid', 'exists:vehicles,id'],
-                // 'last_seen' => ['nullable', 'date']
-                // ]
+                
             $driverUpdated = $driver->update($data);
             $driver = Driver::findOrFail($id)->with('vehicles');
             return response()->json([

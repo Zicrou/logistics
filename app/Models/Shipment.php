@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUuid;
+use Dom\Document;
 use Illuminate\Database\Eloquent\Model;
 
 class Shipment extends Model
@@ -18,4 +19,8 @@ class Shipment extends Model
         'weight',
     ];
     
+
+    public function documents(){
+        return $this->hasMany(Document::class);
+    }
 }

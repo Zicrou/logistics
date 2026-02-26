@@ -39,13 +39,6 @@ class ShipmentController extends Controller implements HasMiddleware
         ], 201);
     }
 
-    public function show($id)
-    {
-        return response()->json([
-            "message" => "Shipment details",
-            "data" => []
-        ]);
-    }
 
     public  function update(ShipmentFormRequest $request, $id)
     {

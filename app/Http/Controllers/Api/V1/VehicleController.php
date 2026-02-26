@@ -39,14 +39,6 @@ class VehicleController extends Controller implements HasMiddleware
             ], 201);
         }
     
-        public function show($id)
-        {
-            return response()->json([
-                "message" => "Vehicle details",
-                "data" => []
-            ]);
-        }
-    
         public  function update(VehicleFormRequest $request, $id)
         {
             $token = $this->validateUser($request->bearerToken());
