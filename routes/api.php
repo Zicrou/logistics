@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\DriverController;
 use App\Http\Controllers\Api\V1\ShipmentController;
 use App\Http\Controllers\Api\V1\VehicleController;
 Route::prefix('v1')->group(function () {
@@ -17,5 +18,6 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('shipments', ShipmentController::class);
         Route::apiResource('vehicles', VehicleController::class);
+        Route::apiResource('drivers', DriverController::class);
     });
 });

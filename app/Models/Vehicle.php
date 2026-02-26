@@ -14,5 +14,10 @@ class Vehicle extends Model
         'gps_device_id',
         'active',
     ];
+
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class);
+    }
    
 }
