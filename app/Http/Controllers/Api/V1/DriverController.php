@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DriverFormRequest;
 use App\Http\Requests\DriverUpdateFormRequest;
 use Illuminate\Http\Request;
-use App\Models\Shipment;
 use App\Models\Driver;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
@@ -49,7 +48,7 @@ class DriverController extends Controller implements HasMiddleware
             $data = $request->validated();
                 
             $driverUpdated = $driver->update($data);
-            $driver = Driver::findOrFail($id)->with('vehicles');
+            $driver = Driver::with(relations: 'vehicle')->findOrFail($id);
             return response()->json([
             "message" => "Driver updated successfully",
             "data" => $driver,

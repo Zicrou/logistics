@@ -23,4 +23,8 @@ class Shipment extends Model
     public function documents(){
         return $this->hasMany(Document::class);
     }
+
+    public function transports(){
+        return $this->belongsTo(Transport::class);
+    }
 }

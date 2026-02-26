@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\DriverController;
 use App\Http\Controllers\Api\V1\ShipmentController;
 use App\Http\Controllers\Api\V1\VehicleController;
+use App\Http\Controllers\Api\V1\TransportController;
+use App\Models\Transport;
+
 Route::prefix('v1')->group(function () {
 
     // Public
@@ -21,5 +24,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('vehicles', VehicleController::class)->except('show');
         Route::apiResource('drivers', DriverController::class)->except('show');
         Route::apiResource('documents', DocumentController::class)->except('show');
+        Route::apiResource('transports', TransportController::class)->except('show');
     });
 });

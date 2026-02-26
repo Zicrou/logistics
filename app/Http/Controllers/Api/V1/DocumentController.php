@@ -48,7 +48,7 @@ class DocumentController extends Controller implements HasMiddleware
     $data = $request->validated();
     $data['user_id'] = $validate_user['userId'];
     $documentUpdated = $document->update($data);
-    $driver = Document::findOrFail($id)->with('vehicles');
+    $driver = Document::with('shipment')->findOrFail($id);
     return response()->json([
         "message" => "Driver updated successfully",
         "data" => $document,
