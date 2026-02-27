@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TransportFormRequest;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -25,17 +26,11 @@ class TransportController extends Controller implements HasMiddleware
         return['transport' => $transport];
     }
 
-    public function store(Request $request)
+    public function store(TransportFormRequest $request)
     {
         $validate_user = $this->validateUser($request->bearerToken());
-        $data = $request->validate([
-            'shipment_id' => ['required', 'uuid', 'exists:shipments,id'],
-            'mode' => ['required', 'string', 'max:20'], 
-            'status' => ['required', 'string', 'max:30'],
-            'departure_date' => ['required', 'date'],
-            'estimated_arrival' => ['required', 'date'],
-            'actual_arrival' => ['required', 'date']
-        ]);
+        $data = $request->validated();
+        
         $transport = Transport::create($data);
 
         return response()->json([
@@ -44,18 +39,11 @@ class TransportController extends Controller implements HasMiddleware
         ], 201);
     }
 
-    public  function update(Request $request, $id)
+    public  function update(TransportFormRequest $request, $id)
     {
             $validate_user = $this->validateUser($request->bearerToken());
             $transport = Transport::findOrFail($id);
-            $data = $request->validate([
-                'shipment_id' => ['required', 'uuid', 'exists:shipments,id'],
-                'mode' => ['required', 'string', 'max:20'], 
-                'status' => ['required', 'string', 'max:30'],
-                'departure_date' => ['required', 'date'],
-                'estimated_arrival' => ['required', 'date'],
-                'actual_arrival' => ['required', 'date']
-            ]);
+            $data = $request->validated();
             //    return['transport'=> $transport]; 
             if($transport->update($data)){
                 $transport = Transport::with('shipment')->findOrFail($id);

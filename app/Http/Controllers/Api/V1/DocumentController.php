@@ -31,8 +31,6 @@ class DocumentController extends Controller implements HasMiddleware
   public function store(DocumentFormRequest $request){
     $validate_user = $this->validateUser($request->bearerToken());
     $data = $request->validated();
-    // $request->user_id = $validate_user['userId'];
-    $data = $request->validated();
     $data['user_id'] = $validate_user['userId'];
     $document = Document::create($data);
     return response()->json([

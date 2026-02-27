@@ -25,6 +25,10 @@ class Shipment extends Model
     }
 
     public function transports(){
-        return $this->belongsTo(Transport::class);
+        return $this->hasMany(Transport::class);
+    }
+
+    public function location_points(){
+        return $this->hasMany(LocationPoints::class);
     }
 }
