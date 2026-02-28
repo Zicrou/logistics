@@ -31,4 +31,8 @@ class Shipment extends Model
     public function location_points(){
         return $this->hasMany(LocationPoints::class);
     }
+
+    public function checkpoints(){
+        return $this->hasMany(Shipment::class);
+    }
 }
