@@ -11,7 +11,7 @@ class LocationPointFormRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class LocationPointFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'shipment_id' => ['exists:shipments,id', 'uuid', 'required'],
+            'longitude' => ['numeric', 'between:-180,180','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
+            'latitude' => ['numeric', 'between:-90,90','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
+            'speed' => ['nullable', 'numeric', 'min:0']
         ];
     }
 }

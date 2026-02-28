@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\LocationPointFormRequest;
 use App\Models\LocationPoints;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -26,14 +27,9 @@ class LocationPointController extends Controller implements HasMiddleware
         // return DriverReource::collection(Shipment::all());
     } 
     
-    public function store(Request $request){
+    public function store(LocationPointFormRequest $request){
     $validate_user = $this->validateUser($request->bearerToken());
-    $data = $request->validate([
-        'shipment_id' => ['exists:shipments,id', 'uuid', 'required'],
-        'longitude' => ['numeric', 'between:-180,180','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
-        'latitude' => ['numeric', 'between:-90,90','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
-        'speed' => ['nullable', 'numeric', 'min:0']
-    ]);
+    $data = $request->validated();
     // $data['user_id'] = $validate_user['userId'];
     $location_point = LocationPoints::create($data);
     return response()->json([
@@ -42,17 +38,16 @@ class LocationPointController extends Controller implements HasMiddleware
     ]);
   }
 
-  public function update(Request $request, $id)
+  public function update(LocationPointFormRequest $request, $id)
   {
     $validate_user = $this->validateUser($request->bearerToken());
-    $location_point = LocationPoints::findOrFail($id);
-    $data = $request->validate([
-        'shipment_id' => ['exists:shipments,id', 'uuid', 'required'],
-        'longitude' => ['numeric', 'between:-180,180','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
-        'latitude' => ['numeric', 'between:-90,90','regex:/^-?\d{1,2}(\.\d{1,8})?$/'],
-        'speed' => ['nullable', 'numeric', 'min:0']
-    ]);
-    $data['user_id'] = $validate_user['userId'];
+    // try{
+        $location_point = LocationPoints::findOrFail($id);
+    // }catch (NotFoundException $e){
+    //     return ['message' => 'This location point does not exist'];
+    // }
+    $data = $request->validated();
+    // $data['user_id'] = $validate_user['userId'];
     if($location_point->update($data)){
         $location_point = LocationPoints::with('shipment')->findOrFail($id);
         return response()->json([
