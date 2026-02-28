@@ -10,6 +10,10 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+use Illuminate\Database\QueryException;
+use Throwable;
 class LocationPointController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -31,7 +35,21 @@ class LocationPointController extends Controller implements HasMiddleware
     $validate_user = $this->validateUser($request->bearerToken());
     $data = $request->validated();
     // $data['user_id'] = $validate_user['userId'];
-    $location_point = LocationPoints::create($data);
+    try{
+        $location_point = LocationPoints::create($data);
+    }catch (ModelNotFoundException $e){
+        return response()->json(['message' => 'This location point does not exist'], 404);
+    }catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Database error',
+            // 'error' => $e->getMessage(), // enable only in debug
+        ], 500);
+
+    } catch (Throwable $e) {
+        return response()->json([
+            'message' => 'Unexpected server error',
+        ], 500);
+    }
     return response()->json([
         "message" => "LocationPoint created successfully",
         "data" => $location_point->load('shipment'),
@@ -41,11 +59,21 @@ class LocationPointController extends Controller implements HasMiddleware
   public function update(LocationPointFormRequest $request, $id)
   {
     $validate_user = $this->validateUser($request->bearerToken());
-    // try{
+    try{
         $location_point = LocationPoints::findOrFail($id);
-    // }catch (NotFoundException $e){
-    //     return ['message' => 'This location point does not exist'];
-    // }
+    }catch (ModelNotFoundException $e){
+        return ['message' => 'This location point does not exist'];
+    }catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Database error',
+            // 'error' => $e->getMessage(), // enable only in debug
+        ], 500);
+
+    } catch (Throwable $e) {
+        return response()->json([
+            'message' => 'Unexpected server error',
+        ], 500);
+    }
     $data = $request->validated();
     // $data['user_id'] = $validate_user['userId'];
     if($location_point->update($data)){
@@ -63,7 +91,21 @@ class LocationPointController extends Controller implements HasMiddleware
     
     $validate_user = $this->validateUser($request->bearerToken());
     $message = ''; 
-    $location_point = LocationPoints::findOrFail($id);
+    try{
+        $location_point = LocationPoints::findOrFail($id);
+    }catch (ModelNotFoundException $e){
+        return ['message' => 'This location point does not exist'];
+    }catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Database error',
+            // 'error' => $e->getMessage(), // enable only in debug
+        ], 500);
+
+    } catch (Throwable $e) {
+        return response()->json([
+            'message' => 'Unexpected server error',
+        ], 500);
+    }
     if($location_point->delete()){
         $message = "LocationPoint  deleted successfully";
     }else{

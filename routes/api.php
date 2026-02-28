@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CheckPointController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\DriverController;
 use App\Http\Controllers\Api\V1\LocationPointController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ShipmentController;
 use App\Http\Controllers\Api\V1\VehicleController;
 use App\Http\Controllers\Api\V1\TransportController;
@@ -30,5 +31,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('transports', TransportController::class)->except('show');
         Route::apiResource('location_points', LocationPointController::class)->except('show');
         Route::apiResource('checkPoints', CheckPointController::class)->except('show');
+        Route::apiResource('payments', PaymentController::class)->except('show');
     });
 });

@@ -10,7 +10,9 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Http\Requests\V1\VehicleFormRequest;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+use Throwable;
 class VehicleController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -31,11 +33,26 @@ class VehicleController extends Controller implements HasMiddleware
             
             $token = $this->validateUser($request->bearerToken());
             $data = $request->validated();
-            $vehicle = Vehicle::create($data);
+            try{
+                $vehicle = Vehicle::create($data);
+            }catch(ModelNotFoundException $e){
+                return response()->json([
+                    'message' => 'Vehicle not found',
+                ], 404);
+            }catch (QueryException $e) {
+                return response()->json([
+                    'message' => 'Database error',
+                    // 'error' => $e->getMessage(), // enable only in debug
+                ], 500);
+
+            } catch (Throwable $e) {
+                return response()->json([
+                    'message' => 'Unexpected server error',
+                ], 500);
+            }
             return response()->json([
-                "message" => "Vehicle created successfully",
+                "message" => "Document created successfully",
                 "data" => $vehicle,
-                "status" => 200
             ], 201);
         }
     
@@ -43,25 +60,61 @@ class VehicleController extends Controller implements HasMiddleware
         {
             $token = $this->validateUser($request->bearerToken());
             $data = $request->validated();
-            $vehicle = Vehicle::findOrFail($id);
-            $vehicleUpdated = $vehicle->update($data);
-            return response()->json([
-                "message" => "Vehicle updated successfully",
-                "data" => $vehicle,
-                "status" => 200
-            ]);
+            try{
+                $vehicle = Vehicle::findOrFail($id);
+            }catch(ModelNotFoundException $e){
+                return response()->json([
+                    'message' => 'Vehicle not found',
+                ], 404);
+            }catch (QueryException $e) {
+                return response()->json([
+                    'message' => 'Database error',
+                    // 'error' => $e->getMessage(), // enable only in debug
+                ], 500);
+
+            } catch (Throwable $e) {
+                return response()->json([
+                    'message' => 'Unexpected server error',
+                ], 500);
+            }
+            if($vehicle->update($data)){
+                $vehicle = Vehicle::with('shipment')->findOrFail($id);
+                return response()->json([
+                    "message" => "Vehicle updated successfully",
+                    "data" => $vehicle,
+                ],201);
+            }else{
+                return response()->json(['message' => "Update error"], 500);
+            }
         }
     
         public function destroy(Request $request, $id)
         {
-            $token = $this->validateUser($request->bearerToken());
-            $vehicle = Vehicle::findOrFail($id);
-            $vehicle->delete();
-            return response()->json([
-                "message" => "Vehicle deleted successfully",
-                "data" => [],
-                "status" => 200
-            ]);
+            $token = $this->validateUser($request->bearerToken());            
+            try{
+                $vehicle = Vehicle::findOrFail($id);
+            }catch(ModelNotFoundException $e){
+                return response()->json([
+                    'message' => 'Vehicle not found',
+                ], 404);
+            }catch (QueryException $e) {
+                return response()->json([
+                    'message' => 'Database error',
+                    // 'error' => $e->getMessage(), // enable only in debug
+                ], 500);
+
+            } catch (Throwable $e) {
+                return response()->json([
+                    'message' => 'Unexpected server error',
+                ], 500);
+            }
+            if($vehicle->delete()){
+                return response()->json([
+                    "message" => "Vehicle deleted successfully"
+                ], 201);
+            }else{
+                return response()->json(["message" => "Delete Document error"], 404);
+            }
         }
 
         private function validateUser($token)

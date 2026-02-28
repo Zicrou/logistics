@@ -33,6 +33,10 @@ class Shipment extends Model
     }
 
     public function checkpoints(){
-        return $this->hasMany(Shipment::class);
+        return $this->hasMany(CheckPoint::class);
+    }
+
+    public function payment(){
+        return $this->hasMany(Payment::class);
     }
 }

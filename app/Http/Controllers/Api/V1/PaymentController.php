@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DriverFormRequest;
-use App\Http\Requests\DriverUpdateFormRequest;
+use App\Http\Requests\V1\PaymentFormRequest;
 use Illuminate\Http\Request;
-use App\Models\Driver;
+
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Resources\ShipmentResource;
+use App\Models\Payment;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Throwable;
-class DriverController extends Controller implements HasMiddleware
+class PaymentController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
@@ -25,21 +25,21 @@ class DriverController extends Controller implements HasMiddleware
     }
     public function index(Request $request)
     {
-        $token = $this->validateUser($request->bearerToken());
-        $driver = Driver::with('vehicle')->get();
-        return['driver' => $driver];
+        $validate_user = $this->validateUser($request->bearerToken());
+        $payment = Payment::with('shipment')->get();
+        return['payment' => $payment];
         // return DriverReource::collection(Shipment::all());
     }
 
-    public function store(DriverFormRequest $request)
+    public function store(PaymentFormRequest $request)
     {
-        $token = $this->validateUser($request->bearerToken());
+        $validate_user = $this->validateUser($request->bearerToken());
         $data = $request->validated();
         try{
-            $driver = Driver::create($data);
+            $payment = Payment::create($data);
         }catch(ModelNotFoundException $e){
             return response()->json([
-                'message' => 'Driver not found',
+                'message' => 'Payment not found',
             ], 404);
         }catch (QueryException $e) {
             return response()->json([
@@ -53,22 +53,21 @@ class DriverController extends Controller implements HasMiddleware
             ], 500);
         }
         return response()->json([
-            "message" => "Driver created successfully",
-            "data" => $driver,
+            "message" => "Payment created successfully",
+            "data" => $payment,
         ], 201);
     }
 
-    public  function update(DriverUpdateFormRequest $request, $id)
+    public  function update(PaymentFormRequest $request, $id)
     {
-            $token = $this->validateUser($request->bearerToken());
-            
+            $validate_user = $this->validateUser($request->bearerToken());
             $data = $request->validated();
                 
             try{
-                $driver = Driver::findOrFail($id);
+                $payment = Payment::findOrFail($id);
             }catch(ModelNotFoundException $e){
                 return response()->json([
-                    'message' => 'Driver not found',
+                    'message' => 'Payment not found',
                 ], 404);
             }catch (QueryException $e) {
                 return response()->json([
@@ -81,11 +80,11 @@ class DriverController extends Controller implements HasMiddleware
                     'message' => 'Unexpected server error',
                 ], 500);
             }
-            if($driver->update($data)){
-                $driver = Driver::with('shipment')->findOrFail($id);
+            if($payment->update($data)){
+                $payment = Payment::with('shipment')->findOrFail($id);
                 return response()->json([
-                    "message" => "Driver updated successfully",
-                    "data" => $driver,
+                    "message" => "Payment",
+                    "data" => $payment,
                 ],201);
             }else{
                 return response()->json(['message' => "Update error"],500);
@@ -94,14 +93,14 @@ class DriverController extends Controller implements HasMiddleware
 
     public function destroy(Request $request, $id)
     {
-        $token = $this->validateUser($request->bearerToken());
+        $validate_user = $this->validateUser($request->bearerToken());
         try{
-            $driver = Driver::findOrFail($id);
+            $payment = Payment::findOrFail($id);
             }catch(ModelNotFoundException $e){
                 return response()->json([
-                    "message" => "Driver not found",
+                    "message" => "Payment not found",
 
-                ],404);
+                ], 404);
             }catch (QueryException $e) {
                 return response()->json([
                     'message' => 'Database error',
@@ -112,12 +111,12 @@ class DriverController extends Controller implements HasMiddleware
                     'message' => 'Unexpected server error',
                 ], 500);
             }
-            if($driver->delete()){
+            if($payment->delete()){
                 return response()->json([
-                    "message" => "Driver deleted successfully"
+                    "message" => "Payment deleted successfully"
                 ], 500);
             }else{
-                return ["message" => "Delete Driver error"];
+                return response()->json(["message" => "Delete Payment error"], 404);
             }
     }
 

@@ -10,7 +10,9 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Models\Shipment;
 use App\Models\Transport;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+use Throwable;
 class TransportController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -31,8 +33,23 @@ class TransportController extends Controller implements HasMiddleware
         $validate_user = $this->validateUser($request->bearerToken());
         $data = $request->validated();
         
-        $transport = Transport::create($data);
+        try{
+            $transport = Transport::create($data);
+        }catch(ModelNotFoundException $e){
+            return response()->json([
+                'message' => 'Transport not found',
+            ], 404);
+        }catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Database error',
+                // 'error' => $e->getMessage(), // enable only in debug
+            ], 500);
 
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Unexpected server error',
+            ], 500);
+        }
         return response()->json([
             "message" => "Transport created successfully",
             "data" => $transport,
@@ -42,7 +59,23 @@ class TransportController extends Controller implements HasMiddleware
     public  function update(TransportFormRequest $request, $id)
     {
             $validate_user = $this->validateUser($request->bearerToken());
-            $transport = Transport::findOrFail($id);
+            try{
+                $transport = Transport::findOrFail($id);
+            }catch(ModelNotFoundException $e){
+                return response()->json([
+                    'message' => 'Transport not found',
+                ], 404);
+            }catch (QueryException $e) {
+                return response()->json([
+                    'message' => 'Database error',
+                    // 'error' => $e->getMessage(), // enable only in debug
+                ], 500);
+
+            } catch (Throwable $e) {
+                return response()->json([
+                    'message' => 'Unexpected server error',
+                ], 500);
+            }
             $data = $request->validated();
             //    return['transport'=> $transport]; 
             if($transport->update($data)){
@@ -50,20 +83,39 @@ class TransportController extends Controller implements HasMiddleware
                 return response()->json([
                     "message" => "Transport updated successfully",
                     "data" => $transport,
-                ]);
+                ], 500);
             }else{
-                return['message' => "Update error"];
+                return response()->json(['message' => "Update error"], 500);
             }
     }
 
     public function destroy(Request $request, $id)
     {
         $validate_user = $this->validateUser($request->bearerToken());
-        $transport = Transport::findOrFail($id);
-        $transport->delete();
-        return response()->json([
-            "message" => "Transport deleted successfully",
-        ]);
+        try{
+            $transport = Transport::findOrFail($id);
+        }catch(ModelNotFoundException $e){
+            return response()->json([
+                'message' => 'Transport not found',
+            ], 404);
+        }catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Database error',
+                // 'error' => $e->getMessage(), // enable only in debug
+            ], 500);
+
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Unexpected server error',
+            ], 500);
+        }
+        if($transport->delete()){
+            return response()->json([
+                "message" => "Transport deleted successfully"
+            ], 201);
+        }else{
+            return response()->json(["message" => "Delete Transport error"], 500);
+        }
     }
     private function validateUser($token)
     {
