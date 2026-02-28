@@ -39,4 +39,8 @@ class Shipment extends Model
     public function payment(){
         return $this->hasMany(Payment::class);
     }
+
+    public function notifications(){
+        return $this->hasMany(Notification::class);
+    }
 }
